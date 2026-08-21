@@ -8,6 +8,83 @@
     <script src="./socket.io.js"></script>
     <link rel="stylesheet" type="text/css" href="./style.css">
     <style type="text/css">
+      #nerf-aim {
+        position: absolute;
+        width: 36px;          /* fits the new open cross */
+        height: 36px;
+        left: 50%;
+        top: calc(50% - 40px);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 30;
+        display: block;
+      }
+    
+      #nerf-aim .nerf-cross-h,
+      #nerf-aim .nerf-cross-v {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background: #ff0000;
+        box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
+        transform: translate(-50%, -50%);
+      }
+    
+      /* === DEFAULT: open cross (gap in center) === */
+      /* Arms start at the old outer ends (±9 px) and extend further out */
+      #nerf-aim .nerf-cross-h {
+        width: 36px;
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          #ff0000 0 9px,          /* left arm */
+          transparent 9px 27px,   /* center gap */
+          #ff0000 27px 100%       /* right arm */
+        );
+      }
+    
+      #nerf-aim .nerf-cross-v {
+        width: 1px;
+        height: 36px;
+        background: linear-gradient(
+          to bottom,
+          #ff0000 0 9px,          /* top arm */
+          transparent 9px 27px,   /* center gap */
+          #ff0000 27px 100%       /* bottom arm */
+        );
+      }
+    
+      /* === ENABLED: circle (18 px) + open cross outside with padding === */
+      #nerf-aim.nerf-aim-enabled {
+        width: 54px;
+        height: 54px;
+        border: 1px solid #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
+      }
+    
+      #nerf-aim.nerf-aim-enabled .nerf-cross-h {
+        width: 48px;   /* longer arms */
+        height: 1px;
+        /* Circle radius 9 px + ~4 px padding → arms start at ~13 px from center */
+        background: linear-gradient(
+          to right,
+          #ff0000 0 11px,           /* left arm */
+          transparent 11px 37px,    /* gap = circle + padding */
+          #ff0000 37px 100%         /* right arm */
+        );
+      }
+    
+      #nerf-aim.nerf-aim-enabled .nerf-cross-v {
+        width: 1px;
+        height: 48px;
+        background: linear-gradient(
+          to bottom,
+          #ff0000 0 11px,           /* top arm */
+          transparent 11px 37px,    /* gap = circle + padding */
+          #ff0000 37px 100%         /* bottom arm */
+        );
+      }
     </style>
   </head>
 <body>
@@ -52,7 +129,13 @@
                                             <div id="tilt_scale" class="tilt_scale"><div id="tilt_scalediv"></div></div>
                                         </div>
                                     </div>
-                                    <div class="feed feed_m"><div class="feed_img_focus"></div></div>
+                                    <div class="feed feed_m">
+                                        <div class="feed_img_focus"></div>
+    					<div id="nerf-aim">
+                                            <span class="nerf-cross-h"></span>
+                                            <span class="nerf-cross-v"></span>
+                                        </div>
+                                   </div>
                                     <div class="feed feed_r"></div>
                                 </div>
                             </div>
