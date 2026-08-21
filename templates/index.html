@@ -8,6 +8,47 @@
     <script src="./socket.io.js"></script>
     <link rel="stylesheet" type="text/css" href="./style.css">
     <style type="text/css">
+      #nerf-aim {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 50%;
+        top: calc(50% - 25px);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 30;
+        display: block;
+      }
+      #nerf-aim .nerf-cross-h,
+      #nerf-aim .nerf-cross-v {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background: #ff0000;
+        box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
+        transform: translate(-50%, -50%);
+      }
+      #nerf-aim .nerf-cross-h {
+        width: 18px;
+        height: 1px;
+      }
+      #nerf-aim .nerf-cross-v {
+        width: 1px;
+        height: 18px;
+      }
+      #nerf-aim.nerf-aim-enabled {
+        width: 54px;
+        height: 54px;
+        border: 1px solid #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
+      }
+      #nerf-aim.nerf-aim-enabled .nerf-cross-h {
+        width: 36px;
+      }
+      #nerf-aim.nerf-aim-enabled .nerf-cross-v {
+        height: 36px;
+      }
     </style>
   </head>
 <body>
@@ -54,20 +95,10 @@
                                     </div>
                                     <div class="feed feed_m">
                                         <div class="feed_img_focus"></div>
-    					<div id="nerf-aim" style="
-        				   position: absolute;
-        				   width: 18px;
-        				   height: 18px;
-        				   border: 1px solid #ff0000;
-        				   border-radius: 50%;
-        				   left: 50%;
-        				   top: calc(50% - 25px);   /* ← change 35px to move it higher/lower */
-        				   transform: translate(-50%, -50%);
-        				   pointer-events: none;
-        				   z-index: 30;
-        		                   box-shadow: 0 0 4px rgba(255,0,0,0.8);
-					   display: none;
-    			               "></div>
+    					<div id="nerf-aim">
+                                            <span class="nerf-cross-h"></span>
+                                            <span class="nerf-cross-v"></span>
+                                        </div>
                                    </div>
                                     <div class="feed feed_r"></div>
                                 </div>

@@ -791,11 +791,12 @@ function nerfFlywheelCtrl(enable) {
     nerfFlywheelOn = (enable == 1);
     cmdJsonCmd({"T":146, "s": enable});
 
-    // Show / hide the red aim circle
+    // Toggle between baseline crosshair and expanded gun reticle
+    var nerfAim = $("#nerf-aim");
     if (enable == 1) {
-        $("#nerf-aim").show();
+        nerfAim.addClass("nerf-aim-enabled");
     } else {
-        $("#nerf-aim").hide();
+        nerfAim.removeClass("nerf-aim-enabled");
     }
 
     var btnGroup = document.getElementById("turret_gun_funcs_btn");
