@@ -30,7 +30,7 @@ class OpencvFuncs():
         self.cv_event.clear()
         self.cv_mode = f['code']['cv_none']
         self.detection_reaction_mode = f['code']['re_none']
-        
+
         self.this_path = project_path
         self.photo_path = self.this_path + '/templates/pictures/'
         self.video_path = self.this_path + '/templates/videos/'
@@ -102,15 +102,15 @@ class OpencvFuncs():
         self.gs_pic_last_time = time.time()
 
         # findline autodrive
-        self.sampling_line_1 = 0.6
+        self.sampling_line_1 = 0.65
         self.sampling_line_2 = 0.9
-        self.slope_impact = 1.5
-        self.base_impact = 0.005
+        self.slope_impact = 1.8
+        self.base_impact = 0.006
         self.speed_impact = 0.5
-        self.line_track_speed = 0.3
+        self.line_track_speed = 0.25
         self.slope_on_speed = 0.1
-        self.line_lower = np.array([25, 150, 70])
-        self.line_upper = np.array([42, 255, 255])
+        self.line_lower = np.array([0, 0, 0])
+        self.line_upper = np.array([180, 255, 80])
 
         # mediapipe detect faces
         self.mp_face_detection = mp.solutions.face_detection
@@ -213,6 +213,21 @@ class OpencvFuncs():
                 cv2.putText(input_frame, str(self.recv_deque[i]), 
                         (round(0.05*640), round(0.1*640 + i * 13)), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.369, (255, 255, 255), 1)
+
+        # ===== Permanent Nerf aim circle (always visible) =====
+#        h, w = input_frame.shape[:2]
+#        center_x = w // 2
+#        center_y = h // 2
+
+#        nerf_offset_y = 50          # pixels ABOVE the camera center (tune this)
+#        nerf_radius   = 10          # size of the small circle
+
+#        aim_x = center_x
+#        aim_y = center_y - nerf_offset_y
+
+#        cv2.circle(input_frame, (aim_x, aim_y), nerf_radius, (0, 0, 255), 1, lineType=cv2.LINE_AA)   # red outline
+#        cv2.circle(input_frame, (aim_x, aim_y), 2, (0, 0, 255), -1, lineType=cv2.LINE_AA)            # red center dot
+        # =====================================================
 
         # render osd
         input_frame = self.osd_render(input_frame)
