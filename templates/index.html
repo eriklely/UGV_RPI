@@ -7,6 +7,8 @@
     <script src="./js-yaml.min.js"></script>
     <script src="./socket.io.js"></script>
     <link rel="stylesheet" type="text/css" href="./style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style type="text/css">
       #nerf-aim {
         position: absolute;
@@ -131,7 +133,7 @@
                                     </div>
                                     <div class="feed feed_m">
                                         <div class="feed_img_focus"></div>
-    					<div id="nerf-aim">
+    					                    <div id="nerf-aim">
                                             <span class="nerf-cross-h"></span>
                                             <span class="nerf-cross-v"></span>
                                         </div>
@@ -186,6 +188,7 @@
                         </div>
                     </div>
                 </div>
+                <div id="gps-map" style="width: 640px; height: 300px; margin-top: 10px;"></div>
                 <div>
                     <div class="controller">
                         <div class="ctl9_middle">
@@ -367,14 +370,19 @@
                                 <div><button onclick="cmdSend(mp_pose,0,0);" class="ctl_btn">MP POSE</button></div>
                             </div>
                         </div>
-                        <div class="long_btn new_page" id="open_jupyter">
-                            <a target="_blank" style="color: #f5bd5f;" href="/"><span>JupyterLab</span>&nbsp;<span>&gt;</span></a>
-                        </div>
                     </div>
                 </div>
             </section>
         </div>
         <div class="box2">
+            <section>
+                <div>
+                    <h2 id="test" class="sc_title normal_sc_title">Bus Servos Initialization Setup</h2>
+                    <div class="long_btn new_page ">
+                        <a class="btn_ico ico_setting" href="./settings.html"><span>Setting Page</span>&nbsp;<span>&gt;</span></a>
+                    </div>
+                </div>
+            </section>
             <section>
                 <div class="photo_gallery">
                     <h2 class="sc_title normal_sc_title">Photo Gallery</h2>
@@ -392,14 +400,6 @@
                     </ul>
                     <div class="long_btn new_page">
                         <a href="./video.html"><span>View Video Files Page</span>&nbsp;(<span id="number-videos">0</span>)&nbsp;<span>&gt;</span></a>
-                    </div>
-                </div>
-            </section>
-            <section>
-                <div>
-                    <h2 id="test" class="sc_title normal_sc_title">Bus Servos Initialization Setup</h2>
-                    <div class="long_btn new_page ">
-                        <a class="btn_ico ico_setting" href="./settings.html"><span>Setting Page</span>&nbsp;<span>&gt;</span></a>
                     </div>
                 </div>
             </section>
@@ -426,13 +426,73 @@
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script> -->
     <script src="./control.js"></script>
     <script src="./main.js"></script>
+    <script>
+        var gpsSocket = io();
+    
+        // Create the map
+        var map = L.map('gps-map', {
+            center: [52.0, 5.0],
+            zoom: 15,
+            zoomControl: true,
+            scrollWheelZoom: true
+        });
+    
+        // Map tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19 //,
+            //attribution: '© OpenStreetMap'
+        }).addTo(map);
+    
+        // Nice red marker icon
+        var robotIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+    
+        var marker = null;
+        var firstFix = true;
+        var currentLatLng = null;
+    
+        // GPS updates
+        gpsSocket.on('gps_update', function(data) {
+            if (data.lat && data.lon) {
+                currentLatLng = [data.lat, data.lon];
+    
+                if (marker) {
+                    marker.setLatLng(currentLatLng);
+                } else {
+                    marker = L.marker(currentLatLng, {icon: robotIcon})
+                        .addTo(map)
+                        .bindPopup("Robot");
+                }
+    
+                // Only auto-center on the very first fix
+                if (firstFix) {
+                    map.setView(currentLatLng, 16);
+                    firstFix = false;
+                }
+            }
+        });
+    
+        // ===== Center on Robot button =====
+        // Creates a simple button in the top-right corner of the map
+        var centerControl = L.control({position: 'topright'});
+        centerControl.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            div.innerHTML = '<a href="#" title="Center on Robot" style="line-height:30px; font-size:18px;">📍</a>';
+            div.onclick = function(e) {
+                e.preventDefault();
+                if (currentLatLng) {
+                    map.setView(currentLatLng, map.getZoom());
+                }
+            };
+            return div;
+        };
+        centerControl.addTo(map);
+    </script>
 </body>
 </html>
-<div>
-    <h2 class="sc_title feed_ct_tt">Turret Gun Funcs</h2>
-    <div id="turret_gun_funcs_btn">
-        <div><button onclick="cmdJsonCmd({'T':146,'s':1});" class="ctl_btn">FLYWHEEL ON</button></div>
-        <div><button onclick="cmdJsonCmd({'T':147});" class="ctl_btn">FIRE</button></div>
-        <div><button onclick="cmdJsonCmd({'T':146,'s':0});" class="ctl_btn">FLYWHEEL OFF</button></div>
-    </div>
-</div>

@@ -2,6 +2,9 @@
 from base_ctrl import BaseController
 import threading
 import yaml, os
+import socket
+import pynmea2
+from threading import Thread
 
 # raspberry pi version check.
 def is_raspberry_pi5():
@@ -47,6 +50,58 @@ import cv_ctrl
 import audio_ctrl
 import os_info
 
+class GpsReceiver:
+    def __init__(self, socketio):
+        self.socketio = socketio
+        self.running = True
+        self.latest = {'lat': None, 'lon': None, 'alt': 0.0}
+        self.host = '0.0.0.0'
+        self.port = 11123
+
+        self.thread = Thread(target=self.server_loop, daemon=True)
+        self.thread.start()
+
+    def server_loop(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((self.host, self.port))
+        sock.listen(1)
+        print(f"[GPS] Listening on {self.host}:{self.port}")
+
+        while self.running:
+            try:
+                conn, addr = sock.accept()
+                print(f"[GPS] Connected from {addr}")
+                buffer = ""
+                while self.running:
+                    data = conn.recv(4096)
+                    if not data:
+                        break
+                    buffer += data.decode('ascii', errors='ignore')
+                    while '\n' in buffer:
+                        line, buffer = buffer.split('\n', 1)
+                        line = line.strip()
+                        if line.startswith('$'):
+                            self.process_nmea(line)
+                conn.close()
+            except Exception as e:
+                print(f"[GPS] Error: {e}")
+                time.sleep(1)
+
+    def process_nmea(self, line):
+        try:
+            msg = pynmea2.parse(line)
+            if isinstance(msg, (pynmea2.types.talker.GGA, pynmea2.types.talker.RMC)):
+                if hasattr(msg, 'latitude') and msg.latitude and msg.longitude:
+                    self.latest['lat'] = float(msg.latitude)
+                    self.latest['lon'] = float(msg.longitude)
+                    if isinstance(msg, pynmea2.types.talker.GGA) and msg.altitude:
+                        self.latest['alt'] = float(msg.altitude)
+                    # Send to browser
+                    self.socketio.emit('gps_update', self.latest)
+        except:
+            pass
+
 # Get system info
 UPLOAD_FOLDER = thisPath + '/sounds/others'
 si = os_info.SystemInfo()
@@ -56,6 +111,7 @@ app = Flask(__name__)
 # log = logging.getLogger('werkzeug')
 # log.disabled = True
 socketio = SocketIO(app)
+gps = GpsReceiver(socketio)
 
 # Set to keep track of RTCPeerConnection instances
 active_pcs = {}
