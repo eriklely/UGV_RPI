@@ -102,30 +102,31 @@ class ReadLine:
 		return start_angle
 
 	def lidar_data_recv(self):
-		if self.lidar_ser == None:
+		if self.lidar_ser is None:
 			return
 		try:
-			while True:
+			self.last_start_angle = 0
+			self.lidar_angles.clear()
+			self.lidar_distances.clear()
+			t0 = time.time()
+			while time.time() - t0 < 2.5:
 				self.header = self.lidar_ser.read(1)
-				if self.header == b'\x54':
-					# Read the rest of the data
-					data = self.header + self.lidar_ser.read(46)
-					hex_data = [int(hex(byte), 16) for byte in data]
-					start_angle = self.parse_lidar_frame(hex_data)
-					if self.last_start_angle > start_angle:
-						break
-					self.last_start_angle = start_angle
-				else:
-					self.lidar_ser.flushInput()
-
-			self.last_start_angle = start_angle
+				if self.header != b'\x54':
+					continue
+				rest = self.lidar_ser.read(46)
+				if len(rest) != 46:
+					continue
+				start_angle = self.parse_lidar_frame(list(self.header + rest))
+				if self.last_start_angle > start_angle and len(self.lidar_angles) > 50:
+					break
+				self.last_start_angle = start_angle
 			self.lidar_angles_show = self.lidar_angles.copy()
 			self.lidar_distances_show = self.lidar_distances.copy()
 			self.lidar_angles.clear()
 			self.lidar_distances.clear()
 		except Exception as e:
 			print(f"[base_ctrl.lidar_data_recv] error: {e}")
-			self.lidar_ser = serial.Serial(glob.glob('/dev/ttyACM*')[0], 230400, timeout=1)
+
 
 
 class BaseController:

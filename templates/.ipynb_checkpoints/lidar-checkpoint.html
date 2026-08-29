@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>UGV lidar</title>
+  <style>
+    body { margin: 0; background: #111; color: #ddd; font-family: sans-serif; }
+    #c { background: #000; display: block; margin: 0 auto; }
+    p { text-align: center; }
+  </style>
+</head>
+<body>
+  <p>Lidar scan — <span id="n">0</span> points —
+     <a href="/" style="color:#8af">back</a></p>
+  <canvas id="c" width="700" height="700"></canvas>
+<script>
+const c = document.getElementById('c');
+const ctx = c.getContext('2d');
+const cx = c.width/2, cy = c.height/2;
+
+async function tick() {
+  const d = await (await fetch('/lidar.json')).json();
+  document.getElementById('n').textContent = d.n + (d.ok ? '' : ' (no data)');
+  if (!d.ok || d.n < 490) return;
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.strokeStyle = '#333';
+  ctx.beginPath(); ctx.arc(cx,cy,20,0,6.28); ctx.stroke();
+  ctx.fillStyle = '#4af';
+  ctx.fillRect(cx-4, cy-4, 8, 8);
+  const scale = (c.width*0.45) / Math.max(d.max_mm || 1, 1);
+  ctx.fillStyle = '#6f6';
+  for (let i = 0; i < d.xs.length; i++) {
+    ctx.fillRect(cx - d.xs[i]*scale - 1, cy + d.ys[i]*scale - 1, 2, 2);
+  }
+}
+setInterval(tick, 200);
+</script>
+</body>
+</html>

@@ -5,6 +5,7 @@ import yaml, os
 import socket
 import pynmea2
 from threading import Thread
+import numpy as np  # lidar polar -> x,y
 
 # raspberry pi version check.
 def is_raspberry_pi5():
@@ -112,6 +113,10 @@ app = Flask(__name__)
 # log.disabled = True
 socketio = SocketIO(app)
 gps = GpsReceiver(socketio)
+# --- lidar scan shared with /lidar page ---
+# Filled by base_data_loop(); read by /lidar.json
+lidar_lock = threading.Lock()
+lidar_scan = {"ok": False, "n": 0, "xs": [], "ys": [], "max_mm": 8000}
 
 # Set to keep track of RTCPeerConnection instances
 active_pcs = {}
@@ -206,6 +211,15 @@ def generate_frames():
 def index():
     audio_ctrl.play_random_audio("connected", False)
     return render_template('index.html')
+
+@app.route('/lidar')
+def lidar_page():
+    return render_template('lidar.html')
+
+@app.route('/lidar.json')
+def lidar_json():
+    with lidar_lock:
+        return jsonify(lidar_scan)
 
 @app.route('/config')
 def get_config():
@@ -528,7 +542,6 @@ def serve_static_settings(filename):
     return send_from_directory('templates', filename)
 
 
-
 # Web socket
 @socketio.on('json', namespace='/json')
 def handle_socket_json(json):
@@ -600,9 +613,35 @@ def base_data_loop():
                 base.rl.read_sensor_data()
                 sensor_read_time = time.time()
         
-        # get lidar data
+        # get lidar data (one full rotation) and cache x,y for the web view
         if base.use_lidar:
-            base.rl.lidar_data_recv()
+            try:
+                # lidar_data_recv() can block until a full 360° wrap
+                base.rl.lidar_data_recv()
+            except Exception as e:
+                print("[lidar] recv", e)
+                time.sleep(0.2)
+                continue
+            angs = base.rl.lidar_angles_show
+            dists = base.rl.lidar_distances_show
+            xs, ys = [], []
+            max_mm = 1
+            # downsample so the browser is not flooded
+            step = max(1, len(angs) // 360) if angs else 1
+            for i in range(0, len(angs), step):
+                d = float(dists[i])
+                if d <= 0:
+                    continue
+                xs.append(d * float(np.cos(angs[i])))
+                ys.append(d * float(np.sin(angs[i])))
+                if d > max_mm:
+                    max_mm = d
+            with lidar_lock:
+                lidar_scan["ok"] = True
+                lidar_scan["n"] = len(xs)
+                lidar_scan["xs"] = xs
+                lidar_scan["ys"] = ys
+                lidar_scan["max_mm"] = max_mm
         
         time.sleep(0.025)
 
