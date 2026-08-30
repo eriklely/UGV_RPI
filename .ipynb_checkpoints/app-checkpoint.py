@@ -52,7 +52,7 @@ import audio_ctrl
 import os_info
 
 class GpsReceiver:
-    def __init__(self, socketio, port='/dev/ttyUSB0', baud=9600):
+    def __init__(self, socketio, port='/dev/ttyUSB0', baud=38400):
         self.socketio = socketio
         self.running = True
         self.latest = {'lat': None, 'lon': None, 'alt': 0.0}
@@ -64,6 +64,7 @@ class GpsReceiver:
     def serial_loop(self):
         import serial
         while self.running:
+            ser = None
             try:
                 print(f"[GPS] Opening {self.port} @ {self.baud}")
                 ser = serial.Serial(self.port, self.baud, timeout=2)
@@ -71,27 +72,32 @@ class GpsReceiver:
                 ser.rts = False
                 while self.running:
                     raw = ser.readline()
-                    print('[GPS raw]', raw[:80])
+                    if not raw:
+                        continue
                     line = raw.decode('ascii', errors='ignore').replace('\x00', '').strip()
                     if '$' in line:
                         line = line[line.index('$'):]
-                        print('[GPS nmea]', line[:90])
                         self.process_nmea(line)
             except Exception as e:
                 print(f"[GPS] Error: {e}")
                 time.sleep(2)
+            finally:
+                if ser is not None:
+                    try:
+                        ser.close()
+                    except Exception:
+                        pass
 
     def process_nmea(self, line):
         try:
             msg = pynmea2.parse(line)
             lat = getattr(msg, 'latitude', None)
             lon = getattr(msg, 'longitude', None)
-            if lat and lon:
+            if lat is not None and lon is not None:
                 self.latest['lat'] = float(lat)
                 self.latest['lon'] = float(lon)
                 if getattr(msg, 'altitude', None):
                     self.latest['alt'] = float(msg.altitude)
-                print('[GPS]', self.latest)
                 self.socketio.emit('gps_update', self.latest)
         except Exception:
             pass
