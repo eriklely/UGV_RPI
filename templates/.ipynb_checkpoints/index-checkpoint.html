@@ -10,9 +10,26 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style type="text/css">
+      main {
+        width: 2090px;
+      }
+      .box1 .section_sensors {
+        width: 758px;
+        margin-right: 10px;
+      }
+      .box1 .section_sensors > div {
+        width: 640px;
+        margin: 40px auto;
+      }
+      @media screen and (max-width: 1200px) {
+        main { width: 100vw; }
+        .box1 .section_sensors { width: 100%; margin-right: 0; }
+        .box1 .section_sensors > div { width: auto; margin: 20px auto; }
+      }
+
       #nerf-aim {
         position: absolute;
-        width: 36px;          /* fits the new open cross */
+        width: 36px;
         height: 36px;
         left: 50%;
         top: calc(50% - 40px);
@@ -21,7 +38,7 @@
         z-index: 30;
         display: block;
       }
-    
+
       #nerf-aim .nerf-cross-h,
       #nerf-aim .nerf-cross-v {
         position: absolute;
@@ -31,32 +48,29 @@
         box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
         transform: translate(-50%, -50%);
       }
-    
-      /* === DEFAULT: open cross (gap in center) === */
-      /* Arms start at the old outer ends (±9 px) and extend further out */
+
       #nerf-aim .nerf-cross-h {
         width: 36px;
         height: 1px;
         background: linear-gradient(
           to right,
-          #ff0000 0 9px,          /* left arm */
-          transparent 9px 27px,   /* center gap */
-          #ff0000 27px 100%       /* right arm */
+          #ff0000 0 9px,
+          transparent 9px 27px,
+          #ff0000 27px 100%
         );
       }
-    
+
       #nerf-aim .nerf-cross-v {
         width: 1px;
         height: 36px;
         background: linear-gradient(
           to bottom,
-          #ff0000 0 9px,          /* top arm */
-          transparent 9px 27px,   /* center gap */
-          #ff0000 27px 100%       /* bottom arm */
+          #ff0000 0 9px,
+          transparent 9px 27px,
+          #ff0000 27px 100%
         );
       }
-    
-      /* === ENABLED: circle (18 px) + open cross outside with padding === */
+
       #nerf-aim.nerf-aim-enabled {
         width: 54px;
         height: 54px;
@@ -64,27 +78,26 @@
         border-radius: 50%;
         box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
       }
-    
+
       #nerf-aim.nerf-aim-enabled .nerf-cross-h {
-        width: 48px;   /* longer arms */
+        width: 48px;
         height: 1px;
-        /* Circle radius 9 px + ~4 px padding → arms start at ~13 px from center */
         background: linear-gradient(
           to right,
-          #ff0000 0 11px,           /* left arm */
-          transparent 11px 37px,    /* gap = circle + padding */
-          #ff0000 37px 100%         /* right arm */
+          #ff0000 0 11px,
+          transparent 11px 37px,
+          #ff0000 37px 100%
         );
       }
-    
+
       #nerf-aim.nerf-aim-enabled .nerf-cross-v {
         width: 1px;
         height: 48px;
         background: linear-gradient(
           to bottom,
-          #ff0000 0 11px,           /* top arm */
-          transparent 11px 37px,    /* gap = circle + padding */
-          #ff0000 37px 100%         /* bottom arm */
+          #ff0000 0 11px,
+          transparent 11px 37px,
+          #ff0000 37px 100%
         );
       }
     </style>
@@ -133,7 +146,7 @@
                                     </div>
                                     <div class="feed feed_m">
                                         <div class="feed_img_focus"></div>
-    					                    <div id="nerf-aim">
+                                        <div id="nerf-aim">
                                             <span class="nerf-cross-h"></span>
                                             <span class="nerf-cross-v"></span>
                                         </div>
@@ -169,7 +182,6 @@
                         </div>
                     </div>
                     <div class="video"><img src="{{ url_for('video_feed') }}" /></div>
-                    <!-- <div class="video"><video id="remoteVideo" autoplay></video></div> -->
                 </div>
                 <div class="video_ctrl">
                     <div>
@@ -180,28 +192,20 @@
                             <div class="video_btn_px_select">
                                 <button id="video_pixel_btn" class="normal_btn normal_btn_size video_btn_px">WebRTC</button>
                                 <ul id="video_pixel_btn_list">
-                                    <!-- <li class="normal_btn" onclick="cmdSend(max_res,2,0);">960P</li>
-                                    <li class="normal_btn" onclick="cmdSend(mid_res,1,0);">480P</li>
-                                    <li class="normal_btn" onclick="cmdSend(min_res,0,0);">240P</li> -->
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="lidar-panel" style="width:640px; margin-top:10px;">
-                  <p style="margin:0 0 4px;">Lidar — <span id="lidar-n">0</span> points</p>
-                  <canvas id="lidar-c" width="640" height="640" style="background:#000; display:block;"></canvas>
-                </div>
-                <div id="gps-map" style="width: 640px; height: 300px; margin-top: 10px;"></div>
                 <div>
                     <div class="controller">
                         <div class="ctl9_middle">
                             <div class="ctl9_middle_pos">
                                 <div class="ctl9_middle_pos ctl9_middle_light">
                                     <div class="ctl9_middle_pos">
-                                        <div 
-                                            onmousedown="cmdSend(head_ct,0,0);" 
-                                            ontouchstart="cmdSend(head_ct,0,0);" 
+                                        <div
+                                            onmousedown="cmdSend(head_ct,0,0);"
+                                            ontouchstart="cmdSend(head_ct,0,0);"
                                             onmouseup="cmdSend(head_ct,0,0);" ontouchend="cmdSend(head_ct,0,0);">
                                         FUNC</div>
                                     </div>
@@ -210,54 +214,54 @@
                         </div>
                         <div class="ctl9 ctl9_base">
                             <ul>
-                                <li class="ctl9_base_btn" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':slow_speed,'R':max_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':slow_speed,'R':max_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+                                <li class="ctl9_base_btn"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':slow_speed,'R':max_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':slow_speed,'R':max_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
 
-                                <li class="ctl9_base_btn2" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':max_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':max_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+                                <li class="ctl9_base_btn2"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':max_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':max_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
 
-                                <li class="ctl9_base_btn" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':slow_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':slow_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+                                <li class="ctl9_base_btn"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':slow_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':slow_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
-                                
-                                <li class="ctl9_base_btn4" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':max_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':max_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+
+                                <li class="ctl9_base_btn4"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':max_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':max_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
-                                
+
                                 <li class="ctl9_base_btn"></li>
-                                
-                                <li class="ctl9_base_btn6" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':-max_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':-max_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+
+                                <li class="ctl9_base_btn6"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':-max_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':max_speed,'R':-max_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
-                                
-                                <li class="ctl9_base_btn" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-slow_speed,'R':-max_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-slow_speed,'R':-max_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+
+                                <li class="ctl9_base_btn"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-slow_speed,'R':-max_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-slow_speed,'R':-max_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
-                                
-                                <li class="ctl9_base_btn8" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-max_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-max_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+
+                                <li class="ctl9_base_btn8"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-max_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-max_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
-                                
-                                <li class="ctl9_base_btn" 
-                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-slow_speed});" 
-                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-slow_speed});" 
-                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});" 
+
+                                <li class="ctl9_base_btn"
+                                onmousedown="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-slow_speed});"
+                                ontouchstart="cmdJsonCmd({'T':cmd_movition_ctrl,'L':-max_speed,'R':-slow_speed});"
+                                onmouseup="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"
                                 ontouchend="cmdJsonCmd({'T':cmd_movition_ctrl,'L':0,'R':0});"></li>
                             </ul>
                         </div>
@@ -268,9 +272,6 @@
                         <div class="audio-files">
                             <div id="audioFiles" class="audio_list">
                                 <div id="audioFilesDrag" class="audio-drop">Drop audio files here!</div>
-                                <!-- <ol>
-                                    <li>1<span class="audioplay"></span><span>Drop audio files here.mp3</span></li>
-                                </ol>-->
                             </div>
                             <div style="visibility: hidden;" id="stopButton" class="pause"><div></div></div>
                         </div>
@@ -285,10 +286,24 @@
                     </div>
                 </div>
             </section>
+
+            <section class="section_sensors box_outline">
+                <div>
+                    <canvas id="lidar-c" width="640" height="480"
+                            style="width:640px;height:480px;background:#000;display:block;"></canvas>
+                    <p style="text-align:center;margin:8px 0;">
+                        <span id="lidar-n">0</span> points
+                    </p>
+                </div>
+                <div>
+                    <div id="gps-map" style="width:640px;height:480px;"></div>
+                </div>
+            </section>
+
             <section class="section_feed_ctrl box_outline">
                 <div>
                     <div class="feed_ctrl_btn">
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Speed Ctrl</h2>
                             <div id="speed_ctrl_btn">
                                 <div><button onclick="speedCtrl(min_rate);" class="ctl_btn ctl_btn_active">Slow</button></div>
@@ -296,7 +311,7 @@
                                 <div><button onclick="speedCtrl(max_rate);" class="ctl_btn">Fast</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">PT Steady/Ahead</h2>
                             <div id="steady_ctrl_btn">
                                 <div><button onclick="steadyCtrl(0, stickSendY);" class="ctl_btn ctl_btn_active">OFF</button></div>
@@ -304,7 +319,7 @@
                                 <div><button onclick="lookAhead();" class="ctl_btn">Ahead</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Simple Detection Type</h2>
                             <div id="d_type_btn">
                                 <div><button onclick="cmdSend(cv_none,0,0);" class="ctl_btn ctl_btn_active">None</button></div>
@@ -312,7 +327,7 @@
                                 <div><button onclick="cmdSend(cv_face,2,0);" class="ctl_btn ctl_btn_faces btn_ico">Faces</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Simple Detection Reaction</h2>
                             <div id="d_reaction_btn">
                                 <div><button onclick="cmdSend(re_none,0,0);" class="ctl_btn ctl_btn_active">None</button></div>
@@ -320,7 +335,7 @@
                                 <div><button onclick="cmdSend(re_reco,0,0);" class="ctl_btn ctl_btn_record btn_ico">Record</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Advance CV Ctrl</h2>
                             <div id="adv_cv_ctrl_btn">
                                 <div><button onclick="cmdSend(mc_lock,0,0);" class="ctl_btn">LOCK</button></div>
@@ -328,7 +343,7 @@
                                 <div><button onclick="cmdSend(cv_auto,0,0);" class="ctl_btn">AUTODRIVE</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Advance CV Funcs</h2>
                             <div id="adv_cv_funcs_btn">
                                 <div><button onclick="cmdSend(cv_objs,0,0);" class="ctl_btn">OBJECTS</button></div>
@@ -336,23 +351,23 @@
                                 <div><button onclick="cmdSend(mp_hand,0,0);" class="ctl_btn">HAND GS</button></div>
                             </div>
                         </div>
-			<div>
-			    <h2 class="sc_title feed_ct_tt">Turret Gun Funcs</h2>
-			    <div id="turret_gun_funcs_btn">
-			        <div><button onclick="nerfFlywheelCtrl(0);" class="ctl_btn ctl_btn_active">GUN DISABLED</button></div>
-				<div><button 
-				    class="ctl_btn"
-				    onmousedown="this.classList.add('ctl_btn_active'); cmdJsonCmd({'T':147});"
-				    onmouseup="this.classList.remove('ctl_btn_active');"
-				    onmouseleave="this.classList.remove('ctl_btn_active');"
-				    ontouchstart="this.classList.add('ctl_btn_active'); cmdJsonCmd({'T':147}); event.preventDefault();"
-				    ontouchend="this.classList.remove('ctl_btn_active');"
-				    ontouchcancel="this.classList.remove('ctl_btn_active');"
-				>FIRE</button></div>
-			        <div><button onclick="nerfFlywheelCtrl(1);" class="ctl_btn">GUN ENABLED</button></div>
-			    </div>
-			</div>
-                        <div>  
+                        <div>
+                            <h2 class="sc_title feed_ct_tt">Turret Gun Funcs</h2>
+                            <div id="turret_gun_funcs_btn">
+                                <div><button onclick="nerfFlywheelCtrl(0);" class="ctl_btn ctl_btn_active">GUN DISABLED</button></div>
+                                <div><button
+                                    class="ctl_btn"
+                                    onmousedown="this.classList.add('ctl_btn_active'); cmdJsonCmd({'T':147});"
+                                    onmouseup="this.classList.remove('ctl_btn_active');"
+                                    onmouseleave="this.classList.remove('ctl_btn_active');"
+                                    ontouchstart="this.classList.add('ctl_btn_active'); cmdJsonCmd({'T':147}); event.preventDefault();"
+                                    ontouchend="this.classList.remove('ctl_btn_active');"
+                                    ontouchcancel="this.classList.remove('ctl_btn_active');"
+                                >FIRE</button></div>
+                                <div><button onclick="nerfFlywheelCtrl(1);" class="ctl_btn">GUN ENABLED</button></div>
+                            </div>
+                        </div>
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Head Light Ctrl</h2>
                             <div id="light_ctrl_btn">
                                 <div><button onclick="cmdSend(led_off,0,0);" class="ctl_btn ctl_btn_active">OFF</button></div>
@@ -360,14 +375,14 @@
                                 <div><button onclick="cmdSend(led_ton,0,0);" class="ctl_btn">ON</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">Base Light Ctrl</h2>
                             <div id="base_led_ctrl_btn">
                                 <div><button onclick="cmdSend(base_of,0,0);" class="ctl_btn">BASE OFF</button></div>
                                 <div><button onclick="cmdSend(base_on,0,0);" class="ctl_btn">BASE ON</button></div>
                             </div>
                         </div>
-                        <div>  
+                        <div>
                             <h2 class="sc_title feed_ct_tt">MediaPipe Funcs</h2>
                             <div id="mp_funcs_btn">
                                 <div><button onclick="cmdSend(mp_face,0,0);" class="ctl_btn">MP FACE</button></div>
@@ -427,27 +442,24 @@
         <div style="background-image: url('./img/grey/movtion.svg');"></div>
         <div style="background-image: url('./img/grey/delete.svg');"></div>
     </footer>
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script> -->
     <script src="./control.js"></script>
     <script src="./main.js"></script>
     <script>
         var gpsSocket = io();
-    
-        // Create the map
+
         var map = L.map('gps-map', {
             center: [52.0, 5.0],
             zoom: 15,
             zoomControl: true,
             scrollWheelZoom: true
         });
-    
-        // Map tiles
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19 //,
-            //attribution: '© OpenStreetMap'
+            maxZoom: 19
         }).addTo(map);
-    
-        // Nice red marker icon
+
+        setTimeout(function () { map.invalidateSize(); }, 200);
+
         var robotIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
@@ -456,16 +468,15 @@
             popupAnchor: [1, -34],
             shadowSize: [41, 41]
         });
-    
+
         var marker = null;
         var firstFix = true;
         var currentLatLng = null;
-    
-        // GPS updates
+
         gpsSocket.on('gps_update', function(data) {
             if (data.lat && data.lon) {
                 currentLatLng = [data.lat, data.lon];
-    
+
                 if (marker) {
                     marker.setLatLng(currentLatLng);
                 } else {
@@ -473,17 +484,14 @@
                         .addTo(map)
                         .bindPopup("Robot");
                 }
-    
-                // Only auto-center on the very first fix
+
                 if (firstFix) {
                     map.setView(currentLatLng, 16);
                     firstFix = false;
                 }
             }
         });
-    
-        // ===== Center on Robot button =====
-        // Creates a simple button in the top-right corner of the map
+
         var centerControl = L.control({position: 'topright'});
         centerControl.onAdd = function(map) {
             var div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
@@ -498,27 +506,37 @@
         };
         centerControl.addTo(map);
 
-        // =====lidar=============
         const c = document.getElementById('lidar-c');
         const ctx = c.getContext('2d');
-        const cx = c.width / 2, cy = c.height / 2;
+        const cx = c.width / 2;
+        const cy = c.height * (2 / 3);
+        const ROBOT_RADIUS_MM = 150;
         
         async function lidarTick() {
-          const d = await (await fetch('/lidar.json')).json();
-          document.getElementById('lidar-n').textContent = d.n + (d.ok ? '' : ' (no data)');
-          if (!d.ok || d.n < 490) return;
-          ctx.clearRect(0, 0, c.width, c.height);
-          ctx.strokeStyle = '#333';
-          ctx.beginPath(); ctx.arc(cx, cy, 12, 0, 6.28); ctx.stroke();
-          ctx.fillStyle = '#4af';
-          ctx.fillRect(cx - 3, cy - 3, 6, 6);
-          const scale = (Math.min(c.width, c.height) * 0.5) / Math.max(d.max_mm || 1, 1);
-          ctx.fillStyle = '#6f6';
-          for (let i = 0; i < d.xs.length; i++) {
-            ctx.fillRect(cx - d.xs[i] * scale - 1, cy + d.ys[i] * scale - 1, 2, 2);
+          try {
+            const d = await (await fetch('/lidar.json')).json();
+            const nEl = document.getElementById('lidar-n');
+            if (nEl) nEl.textContent = d.n + (d.ok ? '' : ' (no data)');
+            if (!d.ok || !d.xs || d.xs.length < 10) return;
+        
+            const scale = (Math.min(c.width, c.height) * 0.8) / Math.max(d.max_mm || 1, 1);
+        
+            ctx.clearRect(0, 0, c.width, c.height);
+        
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(cx, cy, Math.max(3, ROBOT_RADIUS_MM * scale), 0, Math.PI * 2);
+            ctx.fill();
+        
+            ctx.fillStyle = '#6f6';
+            for (let i = 0; i < d.xs.length; i++) {
+              ctx.fillRect(cx - d.xs[i] * scale - 1.5, cy + d.ys[i] * scale - 1.5, 2, 2);
+            }
+          } catch (e) {
+            console.error(e);
           }
         }
-        setInterval(lidarTick, 200);
+        setInterval(lidarTick, 250);
     </script>
 </body>
 </html>
