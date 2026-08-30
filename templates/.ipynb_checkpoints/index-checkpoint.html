@@ -188,6 +188,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="lidar-panel" style="width:640px; margin-top:10px;">
+                  <p style="margin:0 0 4px;">Lidar — <span id="lidar-n">0</span> points</p>
+                  <canvas id="lidar-c" width="640" height="640" style="background:#000; display:block;"></canvas>
+                </div>
                 <div id="gps-map" style="width: 640px; height: 300px; margin-top: 10px;"></div>
                 <div>
                     <div class="controller">
@@ -493,6 +497,28 @@
             return div;
         };
         centerControl.addTo(map);
+
+        // =====lidar=============
+        const c = document.getElementById('lidar-c');
+        const ctx = c.getContext('2d');
+        const cx = c.width / 2, cy = c.height / 2;
+        
+        async function lidarTick() {
+          const d = await (await fetch('/lidar.json')).json();
+          document.getElementById('lidar-n').textContent = d.n + (d.ok ? '' : ' (no data)');
+          if (!d.ok || d.n < 490) return;
+          ctx.clearRect(0, 0, c.width, c.height);
+          ctx.strokeStyle = '#333';
+          ctx.beginPath(); ctx.arc(cx, cy, 12, 0, 6.28); ctx.stroke();
+          ctx.fillStyle = '#4af';
+          ctx.fillRect(cx - 3, cy - 3, 6, 6);
+          const scale = (Math.min(c.width, c.height) * 0.5) / Math.max(d.max_mm || 1, 1);
+          ctx.fillStyle = '#6f6';
+          for (let i = 0; i < d.xs.length; i++) {
+            ctx.fillRect(cx - d.xs[i] * scale - 1, cy + d.ys[i] * scale - 1, 2, 2);
+          }
+        }
+        setInterval(lidarTick, 200);
     </script>
 </body>
 </html>
