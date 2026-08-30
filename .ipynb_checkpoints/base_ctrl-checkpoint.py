@@ -20,11 +20,13 @@ class ReadLine:
 
 		self.sensor_data = []
 		self.sensor_list = []
-		try:
-			self.sensor_data_ser = serial.Serial(glob.glob('/dev/ttyUSB*')[0], 115200)
-			print("/dev/ttyUSB* connected succeed")
-		except:
-			self.sensor_data_ser = None
+		#try:
+		#	self.sensor_data_ser = serial.Serial(glob.glob('/dev/ttyUSB*')[0], 115200)
+		#	print("/dev/ttyUSB* connected succeed")
+		#except:
+		#	self.sensor_data_ser = None
+            
+		self.sensor_data_ser = None
 		self.sensor_data_max_len = 51
 
 		try:

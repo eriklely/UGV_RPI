@@ -52,55 +52,48 @@ import audio_ctrl
 import os_info
 
 class GpsReceiver:
-    def __init__(self, socketio):
+    def __init__(self, socketio, port='/dev/ttyUSB0', baud=9600):
         self.socketio = socketio
         self.running = True
         self.latest = {'lat': None, 'lon': None, 'alt': 0.0}
-        self.host = '0.0.0.0'
-        self.port = 11123
-
-        self.thread = Thread(target=self.server_loop, daemon=True)
+        self.port = port
+        self.baud = baud
+        self.thread = Thread(target=self.serial_loop, daemon=True)
         self.thread.start()
 
-    def server_loop(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((self.host, self.port))
-        sock.listen(1)
-        print(f"[GPS] Listening on {self.host}:{self.port}")
-
+    def serial_loop(self):
+        import serial
         while self.running:
             try:
-                conn, addr = sock.accept()
-                print(f"[GPS] Connected from {addr}")
-                buffer = ""
+                print(f"[GPS] Opening {self.port} @ {self.baud}")
+                ser = serial.Serial(self.port, self.baud, timeout=2)
+                ser.dtr = True
+                ser.rts = False
                 while self.running:
-                    data = conn.recv(4096)
-                    if not data:
-                        break
-                    buffer += data.decode('ascii', errors='ignore')
-                    while '\n' in buffer:
-                        line, buffer = buffer.split('\n', 1)
-                        line = line.strip()
-                        if line.startswith('$'):
-                            self.process_nmea(line)
-                conn.close()
+                    raw = ser.readline()
+                    print('[GPS raw]', raw[:80])
+                    line = raw.decode('ascii', errors='ignore').replace('\x00', '').strip()
+                    if '$' in line:
+                        line = line[line.index('$'):]
+                        print('[GPS nmea]', line[:90])
+                        self.process_nmea(line)
             except Exception as e:
                 print(f"[GPS] Error: {e}")
-                time.sleep(1)
+                time.sleep(2)
 
     def process_nmea(self, line):
         try:
             msg = pynmea2.parse(line)
-            if isinstance(msg, (pynmea2.types.talker.GGA, pynmea2.types.talker.RMC)):
-                if hasattr(msg, 'latitude') and msg.latitude and msg.longitude:
-                    self.latest['lat'] = float(msg.latitude)
-                    self.latest['lon'] = float(msg.longitude)
-                    if isinstance(msg, pynmea2.types.talker.GGA) and msg.altitude:
-                        self.latest['alt'] = float(msg.altitude)
-                    # Send to browser
-                    self.socketio.emit('gps_update', self.latest)
-        except:
+            lat = getattr(msg, 'latitude', None)
+            lon = getattr(msg, 'longitude', None)
+            if lat and lon:
+                self.latest['lat'] = float(lat)
+                self.latest['lon'] = float(lon)
+                if getattr(msg, 'altitude', None):
+                    self.latest['alt'] = float(msg.altitude)
+                print('[GPS]', self.latest)
+                self.socketio.emit('gps_update', self.latest)
+        except Exception:
             pass
 
 # Get system info
@@ -227,6 +220,10 @@ def get_config():
         yaml_content = file.read()
     return yaml_content
 
+@app.route('/gps.json')
+def gps_json():
+    return jsonify(gps.latest)
+    
 # get pictures and videos.
 @app.route('/<path:filename>')
 def serve_static(filename):
