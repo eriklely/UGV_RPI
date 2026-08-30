@@ -44,7 +44,6 @@ The following core files have been modified from the original Waveshare version:
 - Various configuration and setup scripts
 
 ## 🚀 Screen preview
-
 [Enhanced UGV_RPI Features](./media/Screen_preview.jpg)
 
 ### ⚙️ Hardware Compatibility
