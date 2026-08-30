@@ -45,7 +45,7 @@ The following core files have been modified from the original Waveshare version:
 
 ## 🚀 Screen preview
 
-[Enhanced UGV_RPI Features](./media/UGV-Rover-details-23.jpg)
+[Enhanced UGV_RPI Features](./media/Screen_preview.jpg)
 
 ### ⚙️ Hardware Compatibility
 These modifications maintain compatibility with the original Waveshare hardware platforms:
