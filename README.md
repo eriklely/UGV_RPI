@@ -1,4 +1,188 @@
-![GitHub top language](https://img.shields.io/github/languages/top/effectsmachine/ugv_rpi) ![GitHub language count](https://img.shields.io/github/languages/count/effectsmachine/ugv_rpi)
+# UGV_RPI
+
+This repository contains a modified version of the Waveshare UGV robot firmware for Raspberry Pi, featuring additional functionality and improvements made by Erik.ERIKLELY.
+
+**Original repository:** https://github.com/waveshareteam/ugv_rpi  
+**This fork:** Personal enhancements for experimentation and learning
+
+> **Disclaimer:** This is the Waveshare firmware with code changes by an amateur enthusiast. Use at your own risk. While functional, it may not be suitable for production use.
+
+## 📋 Summary of Modifications
+
+This fork builds upon the original Waveshare UGV_RPI repository with the following key additions and modifications:
+
+### 🆕 New Features Added
+- **GPS Integration**: Added GPS functionality for location tracking and navigation
+- **Lidar Support**: Integrated Lidar sensor for distance measurement and obstacle detection
+- **Enhanced Targeting System**: 
+  - Nerf gun aiming capabilities with reticle toggle behavior
+  - Improved auto-targeting and object tracking
+  - Red circle detection for target acquisition
+- **Gamepad Support**: Added gamepad controller support for manual robot operation
+- **Improved Web Interface**: Enhanced main page with additional sensor data displays
+
+### 🔧 Technical Improvements
+- **Configuration Updates**: Refined `config.yaml` for better hardware compatibility
+- **Bug Fixes**: 
+  - Gamepad input handling improvements
+  - Button debouncing enhancements
+  - Various stability improvements
+- **Code Organization**: 
+  - Updated `app.py` with modular improvements
+  - Enhanced `base_ctrl.py` for better chassis control
+  - Improved `audio_ctrl.py` functionality
+
+### 📁 File Modifications
+The following core files have been modified from the original Waveshare version:
+- `app.py` - Main application logic with GPS/Lidar integration
+- `base_ctrl.py` - Enhanced chassis and motion control
+- `config.yaml` - Updated hardware configuration options
+- `audio_ctrl.py` - Improved audio control functions
+- Tutorial notebooks in `tutorial_en/` and `tutorial_cn/` directories
+- Various configuration and setup scripts
+
+### ⚙️ Hardware Compatibility
+These modifications maintain compatibility with the original Waveshare hardware platforms:
+- UGV Rover
+- UGV Beast  
+- RaspRover
+- WAVE ROVER
+- UGV01/UGV02
+
+## 🚀 Features Overview
+
+All original Waveshare features are preserved, including:
+- Real-time video streaming via WebRTC
+- Interactive JupyterLab tutorials
+- Pan-tilt camera control
+- Robotic arm control (when equipped)
+- Cross-platform Flask web application
+- Computer vision capabilities:
+  - Auto targeting and object recognition (OpenCV)
+  - Gesture recognition (MediaPipe)
+  - Face detection (OpenCV & MediaPipe)
+  - Motion detection and line tracking (OpenCV)
+  - Color recognition and tracking
+- Multi-threaded CV processing
+- Audio interactivity
+- Shortcut key controls
+- Photo and video capture
+- Automatic command execution on boot
+- AccessPoint hotspot functionality
+
+## 🔧 Getting Started
+
+### Installation
+Follow the original Waveshare installation procedure:
+
+```bash
+# Clone this repository
+git clone https://github.com/eriklely/UGV_RPI.git
+cd UGV_RPI
+
+# Grant execution permissions
+sudo chmod +x setup.sh
+sudo chmod +x autorun.sh
+
+# Install the application
+sudo ./setup.sh
+
+# Configure autorun
+./autorun.sh
+
+# Optional: Install AccessPoint portal
+cd AccessPopup
+sudo chmod +x installconfig.sh
+sudo ./installconfig.sh
+# Follow on-screen prompts
+
+# Reboot the system
+sudo reboot
+```
+
+### Hardware Configuration
+After installation, configure your specific robot model using:
+```bash
+s 22  # Example: UGV Rover with Camera PT module
+```
+Refer to the original Waveshare documentation for detailed configuration options.
+
+## 📚 Learning Resources
+
+Modified tutorials are available in:
+- `tutorial_en/` - English JupyterLab notebooks
+- `tutorial_cn/` - Chinese JupyterLab notebooks
+
+These tutorials cover:
+- Robotics basics and introduction
+- Chassis motion control
+- Pan-tilt and LED control
+- OLED screen control
+- UI interface building in JupyterLab
+- Chassis feedback retrieval
+- JSON command control
+- Microcontroller command set
+- Automatic boot execution
+- Audio playback and TTS
+- Flask-based low-latency video transmission
+- Real-time video display in JupyterLab
+- Time-lapse photography
+- OpenCV-based motion detection
+- Button-controlled photo capture
+- Face and object recognition
+- Color recognition and tracking
+- Gesture and pose recognition (MediaPipe)
+- Line-following autonomous driving
+- Web application development
+- Main program architecture
+- YAML configuration
+- Crontab automation
+- Custom command line tools
+- Web command line applications
+
+## ⚠️ Important Notes
+
+### Compatibility
+- This firmware is designed for Raspberry Pi-based Waveshare UGV platforms
+- Some features may require additional hardware (GPS module, Lidar sensor, etc.)
+- Refer to individual feature documentation for specific hardware requirements
+
+### Usage Recommendations
+1. **Backup**: Always backup your SD card before flashing new firmware
+2. **Testing**: Test new features in a safe, controlled environment
+3. **Power**: Ensure adequate power supply, especially when using power-hungry accessories
+4. **Safety**: Exercise caution when testing autonomous features or projectile systems
+
+### Known Limitations
+- As an amateur-developed fork, this may contain bugs or instabilities
+- Not all features have undergone extensive testing
+- Documentation for new features may be limited
+- Compatibility with future Waveshare updates is not guaranteed
+
+## 🐛 Troubleshooting
+
+Common issues and solutions:
+- **v4l2.py errors**: If encountering v4l2.py runtime errors, delete the file from both virtual and user Python environments, then restart `app.py`
+- **GPS/Lidar not detected**: Verify hardware connections and check `config.yaml` settings
+- **Web interface issues**: Ensure ports 5000 (web UI) and 8888 (JupyterLab) are accessible
+- **Audio problems**: Check speaker connections and audio configuration in `config.yaml`
+
+## 📜 License
+
+This project maintains the original Waveshare license (GPL-3.0). See the [LICENSE](LICENSE) file for details.
+
+**Note:** Modifications made in this fork are provided under the same GPL-3.0 license as the original work.
+
+## 🙏 Acknowledgements
+
+- Original work by [Waveshare](https://www.waveshare.com/) and contributors
+- Open-source community for various libraries and frameworks used
+- Educational resources that made this learning project possible
+
+---
+
+*Last updated: August 2026*  
+*For issues or questions regarding this specific fork, please refer to the repository issues section.*
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/effectsmachine/ugv_rpi)
 ![GitHub repo size](https://img.shields.io/github/repo-size/effectsmachine/ugv_rpi) ![GitHub](https://img.shields.io/github/license/effectsmachine/ugv_rpi) ![GitHub last commit](https://img.shields.io/github/last-commit/effectsmachine/ugv_rpi)
 
