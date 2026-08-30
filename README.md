@@ -21,6 +21,8 @@ This fork builds upon the original Waveshare UGV_RPI repository with the followi
 - **Gamepad Support**: Added gamepad controller support for manual robot operation
 - **Improved Web Interface**: Enhanced main page with additional sensor data displays
 
+![Enhanced UGV_RPI Features](./media/UGV-Rover-details-23.jpg)
+
 ### 🔧 Technical Improvements
 - **Configuration Updates**: Refined `config.yaml` for better hardware compatibility
 - **Bug Fixes**: 
@@ -40,6 +42,10 @@ The following core files have been modified from the original Waveshare version:
 - `audio_ctrl.py` - Improved audio control functions
 - Tutorial notebooks in `tutorial_en/` and `tutorial_cn/` directories
 - Various configuration and setup scripts
+
+## 🚀 Screen preview
+
+[Enhanced UGV_RPI Features](./media/UGV-Rover-details-23.jpg)
 
 ### ⚙️ Hardware Compatibility
 These modifications maintain compatibility with the original Waveshare hardware platforms:
