@@ -454,7 +454,7 @@
             scrollWheelZoom: true
         });
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19
         }).addTo(map);
 
@@ -536,7 +536,7 @@
             console.error(e);
           }
         }
-        setInterval(lidarTick, 250);
+        setInterval(lidarTick, 500);
     </script>
 </body>
 </html>
