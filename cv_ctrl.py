@@ -881,13 +881,32 @@ class OpencvFuncs():
             return round(obj, 2)
         return obj
 
+    def set_gimbal_angles(self, pan=None, tilt=None):
+        if pan is not None:
+            try:
+                self.pan_angle = float(pan)
+            except (TypeError, ValueError):
+                pass
+        if tilt is not None:
+            try:
+                self.tilt_angle = float(tilt)
+            except (TypeError, ValueError):
+                pass
+
     def update_base_data(self, input_data):
         if not input_data:
             return
         try:
             if self.show_base_info_flag:
                 self.recv_deque.appendleft(json.dumps(self.format_json_numbers(input_data)))
-            if input_data['T'] == 1003:
+            cmd_type = input_data.get('T')
+            # Chassis feedback includes actual gimbal angles: {'T':1001,...,'pan':0,'tilt':0}
+            if cmd_type == 1001:
+                if 'pan' in input_data:
+                    self.set_gimbal_angles(pan=input_data.get('pan'))
+                if 'tilt' in input_data:
+                    self.set_gimbal_angles(tilt=input_data.get('tilt'))
+            elif cmd_type == 1003:
                 self.info_deque.appendleft({'text':json.dumps(input_data['mac']),'color':(16,64,255),'size':0.5})
                 wrapped_lines = textwrap.wrap(json.dumps(input_data['megs']), self.recv_line_max)
                 for line in wrapped_lines:

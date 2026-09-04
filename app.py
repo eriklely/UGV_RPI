@@ -558,6 +558,11 @@ def serve_static_settings(filename):
 def handle_socket_json(json):
     try:
         base.base_json_ctrl(json)
+        # Joystick/web gimbal commands never went through cvf, so /gaze.json stayed at 0.
+        if isinstance(json, dict):
+            cmd_type = json.get('T')
+            if cmd_type in (f['cmd_config']['cmd_gimbal_ctrl'], f['cmd_config']['cmd_gimbal_base_ctrl']):
+                cvf.set_gimbal_angles(json.get('X'), json.get('Y'))
     except Exception as e:
         print("Error handling JSON data:", e)
         return
