@@ -233,7 +233,11 @@ def gps_json():
 @app.route('/eyes')
 def eyes_page():
     return render_template('eyes.html')
-    
+
+@app.route('/gaze.json')
+def gaze_json():
+    return jsonify({'pan': cvf.pan_angle, 'tilt': cvf.tilt_angle})    
+
 # get pictures and videos.
 @app.route('/<path:filename>')
 def serve_static(filename):
