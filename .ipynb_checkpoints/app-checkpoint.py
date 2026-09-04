@@ -229,6 +229,10 @@ def get_config():
 @app.route('/gps.json')
 def gps_json():
     return jsonify(gps.latest)
+
+@app.route('/eyes')
+def eyes_page():
+    return render_template('eyes.html')
     
 # get pictures and videos.
 @app.route('/<path:filename>')
