@@ -128,7 +128,8 @@
     }
 
     function applyGaze() {
-      var tx = 'translate(calc(-50% + ' + (x * 28) + 'px), calc(-50% + ' + (y * 18) + 'px))';
+      // Percent of iris size so travel scales with the large eyes.
+      var tx = 'translate(calc(-50% + ' + (x * 58) + '%), calc(-50% + ' + (y * 42) + '%))';
       irisL.style.transform = tx;
       irisR.style.transform = tx;
     }
