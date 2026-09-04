@@ -21,7 +21,7 @@
       align-items: center;
       justify-content: center;
       gap: 10vw;
-      padding: 0 4vw 72px;
+      padding: 0 4vw;
       box-sizing: border-box;
     }
     .eye {
@@ -93,25 +93,11 @@
       background: #444; z-index: 10;
     }
     .dot.on { background: #3ddc84; }
-    .hud {
-      position: fixed; bottom: 8px; left: 0; right: 0;
-      text-align: center; z-index: 10;
-    }
-    .hud button {
-      font-size: 14px;
-      padding: 6px 12px;
-      margin: 3px 4px;
-      border: 0;
-      border-radius: 16px;
-      background: #222;
-      color: #ddd;
-    }
-    .hud button.active { background: #3a5cff; color: #fff; }
 
     @media (max-width: 400px) {
       .stage {
         gap: 14vw;
-        padding: 0 3vw 88px;
+        padding: 0 3vw;
       }
       .eye {
         width: 34vw;
@@ -137,24 +123,15 @@
       <div class="lid bot"></div>
     </div>
   </div>
-  <div class="hud">
-    <button type="button" onclick="look(-1,0)">Left</button>
-    <button type="button" onclick="look(0,0)">Center</button>
-    <button type="button" onclick="look(1,0)">Right</button>
-    <button type="button" onclick="doBlink()">Blink</button>
-    <br>
-    <button type="button" data-mood="default" class="active" onclick="setMood('default')">Default</button>
-    <button type="button" data-mood="angry" onclick="setMood('angry')">Angry</button>
-    <button type="button" data-mood="happy" onclick="setMood('happy')">Happy</button>
-    <button type="button" data-mood="tired" onclick="setMood('tired')">Tired</button>
-    <button type="button" data-mood="confused" onclick="setMood('confused')">Confused</button>
-  </div>
   <script>
     var x = 0, y = 0, targetX = 0, targetY = 0;
     var liveUntil = 0;
     var mood = 'default';
-    var irisL = document.getElementById('irisL');
-    var irisR = document.getElementById('irisR');
+    var moods = ['default', 'angry', 'happy', 'tired', 'confused'];
+    var looks = [
+      [-1, 0], [0, 0], [1, 0],
+      [-0.7, 0.25], [0.7, 0.25], [0, -0.35]
+    ];
     var eyeL = document.getElementById('eyeL');
     var eyeR = document.getElementById('eyeR');
     var eyes = [eyeL, eyeR];
@@ -163,6 +140,18 @@
 
     function clamp(v, a, b) {
       return v < a ? a : (v > b ? b : v);
+    }
+
+    function rand(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function pick(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function later(fn, minMs, maxMs) {
+      setTimeout(fn, rand(minMs, maxMs));
     }
 
     function applyGaze() {
@@ -183,10 +172,6 @@
     function setMood(name) {
       mood = name || 'default';
       stage.className = mood === 'default' ? 'stage' : 'stage mood-' + mood;
-      var buttons = document.querySelectorAll('.hud button[data-mood]');
-      for (var i = 0; i < buttons.length; i++) {
-        buttons[i].classList.toggle('active', buttons[i].getAttribute('data-mood') === mood);
-      }
     }
 
     function doBlink() {
@@ -205,24 +190,33 @@
     }
     tick();
 
-    setInterval(function () {
-      if (Math.random() < 0.35) doBlink();
-    }, 2200);
+    function randomBlink() {
+      doBlink();
+      later(randomBlink, 1400, 5200);
+    }
 
-    setInterval(function () {
-      if (Date.now() < liveUntil) return;
-      if (Math.random() < 0.55) {
-        targetX = (Math.random() * 2 - 1) * 0.85;
-        targetY = (Math.random() * 2 - 1) * 0.35;
-      } else {
-        targetX = 0; targetY = 0;
+    function randomLook() {
+      if (Date.now() >= liveUntil) {
+        if (Math.random() < 0.35) {
+          look(0, 0);
+        } else {
+          var dir = pick(looks);
+          look(dir[0], dir[1]);
+        }
       }
-    }, 2600);
+      later(randomLook, 900, 3600);
+    }
 
-    document.getElementById('stage').addEventListener('click', function (e) {
-      var mid = window.innerWidth / 2;
-      look(e.clientX < mid ? -1 : 1, 0);
-    });
+    function randomMood() {
+      var next = pick(moods);
+      if (next === mood && Math.random() < 0.6) next = 'default';
+      setMood(next);
+      later(randomMood, 2500, 9000);
+    }
+
+    later(randomBlink, 400, 1800);
+    later(randomLook, 600, 1800);
+    later(randomMood, 1200, 4000);
 
     function setGazeFromAngles(pan, tilt) {
       pan = Number(pan) || 0;
