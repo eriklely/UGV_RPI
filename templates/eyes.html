@@ -16,7 +16,7 @@
       user-select: none;
     }
     .stage {
-      width: 100vw; height: 100vh;
+      width: 100vw; height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -43,7 +43,10 @@
     }
     .core {
       position: absolute;
-      inset: 6%;
+      top: 6%;
+      right: 6%;
+      bottom: 6%;
+      left: 6%;  
       background: radial-gradient(circle at 32% 28%, #b9f6ff 0%, #2ee6ff 28%, #00b7ff 68%, #0077ff 100%);
       border-radius: 22%;
       box-shadow:
@@ -114,6 +117,7 @@
         height: 30vh;
         max-width: 118px;
         max-height: 150px;
+        margin: 0 7vw;
       }
     }
   </style>
@@ -161,8 +165,8 @@
     }
 
     function applyGaze() {
-      var gx = (x * 18) + '%';
-      var gy = (y * 14) + '%';
+      var gx = (x * 80) + '%';
+      var gy = (y * 80) + '%';
       eyeL.style.setProperty('--gx', gx);
       eyeL.style.setProperty('--gy', gy);
       eyeR.style.setProperty('--gx', gx);
