@@ -221,7 +221,7 @@
     function setGazeFromAngles(pan, tilt) {
       pan = Number(pan) || 0;
       tilt = Number(tilt) || 0;
-      look(clamp(pan / 90, -1, 1), clamp(-tilt / 45, -1, 1));
+      look(clamp(-pan / 90, -1, 1), clamp(-tilt / 45, -1, 1));
     }
     
     function pullGaze() {
